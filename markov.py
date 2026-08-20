@@ -1,5 +1,45 @@
 from collections import defaultdict
 import random
+import json
+
+def main():
+    with open("jekyll.txt") as f:
+        text = f.read()
+        words = text.split()
+    
+    chain = pair2(words, defaultdict(dict))
+    # print(type(chain))
+    regular_dict = {k: dict(v) for k,v in chain.items()}
+    # print(regular_dict)
+    with open("chains.json", 'w') as file:
+        json.dump(regular_dict, file)
+        
+
+    firstword = random.choice([word for word in regular_dict if word[0].isupper() and word[-1] != "."])
+    
+    output = firstword.split()
+    # print(firstword, regular_dict[firstword])
+     
+     # pick acc to the frquency
+    next_word = random.choices(list(regular_dict[firstword]),weights=list(regular_dict[firstword].values()))
+    # print(next_word)
+    output.append(next_word[0])
+    # print(output)
+
+    i = 1
+    while i <= 90:
+        new_key = " ".join(output[-2:])
+        if new_key in regular_dict:
+            # print(new_key)
+            # print(regular_dict[new_key])
+            next_word = random.choices(list(regular_dict[new_key]),weights=list(regular_dict[new_key].values()), cum_weights=None)
+            output.append(next_word[0])
+    
+        else:
+            break
+        
+        i+=1
+    # print(" ".join(output))
 
 
 def pair2(words, chain):
@@ -14,43 +54,46 @@ def pair2(words, chain):
 
         else:
             chain[key][words[i+2]] += 1
+    return chain
 
 
-with open("jekyll.txt") as f:
-    text = f.read()
-    words = text.split()
+# with open("jekyll.txt") as f:
+#     text = f.read()
+#     words = text.split()
 
-chain = defaultdict(dict)
-pair2(words, chain)
-regular_dict = {k: dict(v) for k,v in chain.items()}
+# chain = defaultdict(dict)
+# pair2(words, chain)
+# regular_dict = {k: dict(v) for k,v in chain.items()}
+# with open("chains.json", 'w') as file:
+#     json.dump(regular_dict, file)
 # print(regular_dict)
 
 #choose a world with capital first letter
-firstword = random.choice([word for word in regular_dict if word[0].isupper() and word[-1] != "."])
-output = firstword.split()
+# firstword = random.choice([word for word in regular_dict if word[0].isupper() and word[-1] != "."])
+# output = firstword.split()
 # print(firstword, regular_dict[firstword])
 
 # pick acc to the frquency
-next_word = random.choices(list(regular_dict[firstword]),weights=list(regular_dict[firstword].values()))
+# next_word = random.choices(list(regular_dict[firstword]),weights=list(regular_dict[firstword].values()))
 
 # print(next_word)
-output.append(next_word[0])
+# output.append(next_word[0])
 # print(output)
 
-i = 1
-while i <= 50:
-    new_key = " ".join(output[-2:])
-    if new_key in regular_dict:
-        # print(new_key)
-        # print(regular_dict[new_key])
-        next_word = random.choices(list(regular_dict[new_key]),weights=list(regular_dict[new_key].values()), cum_weights=None)
-        output.append(next_word[0])
+# i = 1
+# while i <= 50:
+#     new_key = " ".join(output[-2:])
+#     if new_key in regular_dict:
+#         # print(new_key)
+#         # print(regular_dict[new_key])
+#         next_word = random.choices(list(regular_dict[new_key]),weights=list(regular_dict[new_key].values()), cum_weights=None)
+#         output.append(next_word[0])
 
-    else:
-        break
+#     else:
+#         break
     
-    i+=1
-
-print(" ".join(output))
+#     i+=1
+# print(" ".join(output))
 # print(len(output))
-    
+if __name__ == "__main__":
+    main()
