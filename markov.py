@@ -1,19 +1,28 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 import random
 import json
 
 def main():
-    with open("jekyll.txt") as f:
-        text = f.read()
-        words = text.split()
-    
-    chain = pair2(words, defaultdict(dict))
-    # print(type(chain))
-    regular_dict = {k: dict(v) for k,v in chain.items()}
-    # print(regular_dict)
-    with open("chains.json", 'w') as file:
-        json.dump(regular_dict, file)
-        
+    try:
+        with open("chains.json") as json_file:
+            data = json.load(json_file)
+            regular_dict, common_words = data["chain"], Counter(data["common_words"])
+            # print(regular_dict)
+
+    #if json file does not exist make the chain and json file
+    except FileNotFoundError:
+        with open("jekyll.txt") as txt:
+            text = txt.read()
+            words = text.split()
+
+        common_words = Counter(words)
+        chain = pair2(words, defaultdict(dict))
+        # print(type(chain))
+        regular_dict = {k: dict(v) for k,v in chain.items()}
+        data = {"chain": regular_dict, "common_words": common_words}
+        # print(regular_dict)
+        with open("chains.json", 'w') as file:
+            json.dump(data, file, indent= 2)
 
     firstword = random.choice([word for word in regular_dict if word[0].isupper() and word[-1] != "."])
     
@@ -39,7 +48,8 @@ def main():
             break
         
         i+=1
-    # print(" ".join(output))
+    print(" ".join(output))
+    print(common_words.most_common(5))
 
 
 def pair2(words, chain):
